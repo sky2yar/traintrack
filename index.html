@@ -1,2 +1,259 @@
-# traintrack
-Trainingstracker
+<!DOCTYPE html>
+
+<html lang="de">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>TrainTrack</title>
+
+<style>
+
+body {
+
+  background:#101411;
+
+  color:white;
+
+  font-family:Arial,sans-serif;
+
+  padding:20px;
+
+}
+
+h1 span { color:#8bd49b; }
+
+.card {
+
+  background:#1b241e;
+
+  padding:18px;
+
+  border-radius:16px;
+
+  margin:15px 0;
+
+}
+
+button {
+
+  background:#8bd49b;
+
+  color:#102015;
+
+  border:0;
+
+  padding:14px;
+
+  border-radius:10px;
+
+  font-weight:bold;
+
+  width:100%;
+
+}
+
+input,select {
+
+  display:block;
+
+  width:100%;
+
+  padding:12px;
+
+  margin:10px 0;
+
+  box-sizing:border-box;
+
+  background:#101711;
+
+  color:white;
+
+  border:1px solid #405044;
+
+  border-radius:9px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Train<span>Track</span></h1>
+
+<p>DEIN TRAINING. DEIN FORTSCHRITT.</p>
+
+<div class="card">
+
+<h2>Dein Überblick</h2>
+
+<p>Einheiten: <b id="count">0</b></p>
+
+<p>Trainingsminuten: <b id="minutes">0</b></p>
+
+</div>
+
+<div class="card">
+
+<h2>Training eintragen</h2>
+
+<select id="sport">
+
+<option>Fitnessstudio</option>
+
+<option>Laufen</option>
+
+<option>Schwimmen</option>
+
+<option>Radfahren</option>
+
+<option>Kettlebell</option>
+
+<option>Yoga / Mobility</option>
+
+<option>Eigene Sportart</option>
+
+</select>
+
+<input id="date" type="date">
+
+<input id="duration" type="number" placeholder="Dauer in Minuten">
+
+<input id="notes" placeholder="Notizen">
+
+<button onclick="saveWorkout()">Training speichern</button>
+
+</div>
+
+<div class="card">
+
+<h2>Trainingsverlauf</h2>
+
+<div id="history">Noch keine Trainings.</div>
+
+</div>
+
+<script>
+
+let workouts=JSON.parse(
+
+ localStorage.getItem("traintrack") || "[]"
+
+);
+
+document.getElementById("date").value=
+
+new Date().toISOString().slice(0,10);
+
+function saveWorkout(){
+
+ const duration=Number(
+
+  document.getElementById("duration").value
+
+ );
+
+ if(duration<1){
+
+  alert("Bitte Dauer eingeben");
+
+  return;
+
+ }
+
+ workouts.unshift({
+
+  sport:document.getElementById("sport").value,
+
+  date:document.getElementById("date").value,
+
+  duration:duration,
+
+  notes:document.getElementById("notes").value
+
+ });
+
+ localStorage.setItem(
+
+  "traintrack",
+
+  JSON.stringify(workouts)
+
+ );
+
+ document.getElementById("duration").value="";
+
+ document.getElementById("notes").value="";
+
+ render();
+
+}
+
+function render(){
+
+ document.getElementById("count").textContent=
+
+ workouts.length;
+
+ document.getElementById("minutes").textContent=
+
+ workouts.reduce((sum,w)=>sum+w.duration,0);
+
+ document.getElementById("history").innerHTML=
+
+ workouts.length
+
+ ? workouts.map((w,i)=>`
+
+  <div style="padding:12px;border-bottom:1px solid #405044">
+
+   <b>${escapeHTML(w.sport)}</b><br>
+
+   ${escapeHTML(w.date)} · ${w.duration} Minuten
+
+   <p>${escapeHTML(w.notes)}</p>
+
+   <button onclick="deleteWorkout(${i})">Löschen</button>
+
+  </div>
+
+ `).join("")
+
+ : "Noch keine Trainings.";
+
+}
+
+function escapeHTML(value){
+
+ return String(value).replace(/[&<>"']/g,c=>({
+
+  "&":"&amp;","<":"&lt;",">":"&gt;",
+
+  '"':"&quot;","'":"&#39;"
+
+ })[c]);
+
+}
+
+function deleteWorkout(i){
+
+ workouts.splice(i,1);
+
+ localStorage.setItem("traintrack",JSON.stringify(workouts));
+
+ render();
+
+}
+
+render();
+
+</script>
+
+</body>
+
+</html>
