@@ -366,7 +366,6 @@ let data = {
   plan: {},
   profile: { name: "" }
 };
-
 function loadData() {
   try {
     const saved = localStorage.getItem("skyform_data");
@@ -378,7 +377,39 @@ function loadData() {
 
 function saveData() {
   localStorage.setItem("skyform_data", JSON.stringify(data));
+}function loadData() {
+  try {
+    const saved = localStorage.getItem("skyform_data");
+    if (saved) {
+      data = { ...data, ...JSON.parse(saved) };
+    }
+  } catch (e) {
+    alert("Speicherfehler beim Laden: " + e.message);
+  }
 }
+
+function saveData() {
+  try {
+    const backup = JSON.stringify(data);
+    localStorage.setItem("skyform_data", backup);
+
+    // Prüfen, ob die Daten wirklich gespeichert wurden
+    if (localStorage.getItem("skyform_data") !== backup) {
+      throw new Error("Speicherung konnte nicht bestätigt werden.");
+    }
+  } catch (e) {
+    alert("Deine Daten konnten nicht gespeichert werden: " + e.message);
+  }
+}
+
+// Safari soll den Speicher nach Möglichkeit dauerhaft behalten
+if (navigator.storage && navigator.storage.persist) {
+  navigator.storage.persist().catch(() => {});
+}
+
+// Beim Verlassen der Seite nochmals speichern
+window.addEventListener("pagehide", saveData);
+
 
 function showPage(id, button) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
