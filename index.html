@@ -1,41 +1,869 @@
 <!DOCTYPE html>
-
 <html lang="de">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<meta name="theme-color" content="#101713">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101b17">
 <title>SKYFORM</title>
-
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-
 <style>
+:root {
+  --bg: #101b17;
+  --panel: #1b2923;
+  --panel2: #24352c;
+  --green: #a8c5a5;
+  --green2: #6f9878;
+  --text: #f0f4ef;
+  --muted: #a6b5aa;
+  --line: #35473c;
+  --danger: #d78e8e;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+header {
+  padding: 25px 20px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.logo {
+  font-size: 25px;
+  font-weight: 850;
+  letter-spacing: 3px;
+  color: var(--green);
+}
+.tagline {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 2px;
+  margin-top: 4px;
+}
+main {
+  max-width: 760px;
+  margin: auto;
+  padding: 0 15px 100px;
+}
+nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-around;
+  background: #17231d;
+  border-top: 1px solid var(--line);
+  padding: 9px 3px calc(9px + env(safe-area-inset-bottom));
+}
+nav button {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  font-size: 10px;
+  padding: 5px;
+  min-width: 58px;
+}
+nav button span {
+  display: block;
+  font-size: 19px;
+  margin-bottom: 3px;
+}
+nav button.active { color: var(--green); }
+.page { display: none; }
+.page.active { display: block; }
+h1 { font-size: 26px; margin: 12px 0 5px; }
+h2 { font-size: 19px; margin: 20px 0 12px; }
+h3 { font-size: 15px; margin: 0 0 10px; }
+p { color: var(--muted); line-height: 1.5; }
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  padding: 16px;
+  margin: 12px 0;
+}
+.hero {
+  background: linear-gradient(140deg, #2b4536, #1b2923 75%);
+  border: 1px solid #49624f;
+  border-radius: 21px;
+  padding: 22px;
+  margin: 15px 0;
+}
+.hero p { margin-bottom: 0; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.stat {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  padding: 15px;
+}
+.stat strong {
+  display: block;
+  font-size: 25px;
+  color: var(--green);
+  margin-top: 7px;
+}
+.stat small { color: var(--muted); }
+button, input, textarea, select {
+  font: inherit;
+}
+.action {
+  border: 0;
+  border-radius: 12px;
+  background: var(--green);
+  color: #142019;
+  padding: 12px 16px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.action.secondary {
+  background: var(--panel2);
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+.action.danger {
+  background: #492b2b;
+  color: #ffdede;
+}
+input, textarea, select {
+  width: 100%;
+  background: #111d17;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 12px;
+  margin: 6px 0 12px;
+}
+textarea {
+  min-height: 115px;
+  resize: vertical;
+  line-height: 1.5;
+}
+label {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 8px;
+}
+.row {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.row > * { flex: 1; }
+.muted { color: var(--muted); }
+.small { font-size: 12px; }
+.entry {
+  border-left: 3px solid var(--green2);
+  padding: 9px 12px;
+  margin: 10px 0;
+  background: #17231d;
+  border-radius: 0 10px 10px 0;
+}
+.entry strong { color: var(--green); }
+.pill {
+  display: inline-block;
+  background: #304638;
+  color: var(--green);
+  border-radius: 20px;
+  padding: 5px 9px;
+  font-size: 11px;
+  margin: 3px;
+}
+hr { border: 0; border-top: 1px solid var(--line); margin: 17px 0; }
+.empty {
+  color: var(--muted);
+  text-align: center;
+  padding: 20px 5px;
+}
+.weekday {
+  color: var(--green);
+  font-weight: 750;
+  margin-top: 14px;
+}
+.progress {
+  height: 9px;
+  background: #101b17;
+  border-radius: 20px;
+  overflow: hidden;
+  margin: 9px 0;
+}
+.progress div {
+  height: 100%;
+  background: var(--green2);
+  width: 0%;
+}
+@media (min-width: 600px) {
+  main { padding-top: 12px; }
+  nav { left: 50%; transform: translateX(-50%); max-width: 760px; border-radius: 16px 16px 0 0; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="logo">SKYFORM</div>
+    <div class="tagline">YOUR TRAINING SPACE</div>
+  </div>
+  <div class="pill">● READY</div>
+</header>
 
-:root{--bg:#101713;--panel:#1d2922;--sage:#91cda1;--silver:#c4c9c4;--muted:#89958d}
+<main>
 
-*{box-sizing:border-box}
+<section id="home" class="page active">
+  <div class="hero">
+    <div class="small">WILLKOMMEN BEI SKYFORM</div>
+    <h1>Dein Weg. Dein Tempo.</h1>
+    <p>Behalte deine Aktivitäten, Ziele und Fortschritte im Blick.</p>
+    <button class="action" onclick="showPage('training')">Training eintragen</button>
+  </div>
+  <div class="grid">
+    <div class="stat"><small>Trainingseinheiten</small><strong id="statSessions">0</strong></div>
+    <div class="stat"><small>Aktive Tage</small><strong id="statDays">0</strong></div>
+    <div class="stat"><small>Sportarten</small><strong id="statSports">0</strong></div>
+    <div class="stat"><small>Erfolge</small><strong id="statAwards">0</strong></div>
+  </div>
+  <h2>Letzte Aktivitäten</h2>
+  <div class="card" id="recentList"><div class="empty">Noch keine Trainings eingetragen.</div></div>
+  <h2>Deine Ziele</h2>
+  <div class="card" id="homeGoals"><div class="empty">Lege dein erstes persönliches Ziel an.</div></div>
+</section>
 
-body{margin:0;background:var(--bg);color:#f2f5f2;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:85px}
+<section id="training" class="page">
+  <h1>Training</h1>
+  <p>Trage eine oder mehrere Einheiten für denselben Tag ein.</p>
+  <div class="card">
+    <h3>Neue Trainingseinheit</h3>
+    <label>Datum</label>
+    <input type="date" id="workDate">
+    <label>Sportart</label>
+    <select id="workSport">
+      <option>Krafttraining</option>
+      <option>Laufen</option>
+      <option>Radfahren</option>
+      <option>Gehen</option>
+      <option>Schwimmen</option>
+      <option>Fußball</option>
+      <option>Basketball</option>
+      <option>Tennis</option>
+      <option>Yoga</option>
+      <option>Sonstiges</option>
+    </select>
+    <label>Name der Einheit</label>
+    <input id="workName" placeholder="z. B. Oberkörper, lockerer Lauf ...">
+    <div class="row">
+      <div>
+        <label>Dauer (Minuten)</label>
+        <input type="number" id="workDuration" min="0" placeholder="45">
+      </div>
+      <div>
+        <label>Notiz (optional)</label>
+        <input id="workNote" placeholder="Wie lief es?">
+      </div>
+    </div>
+    <label>Details / Übungen</label>
+    <textarea id="workDetails" placeholder="Schreibe hier deine gesamte Einheit hinein ..."></textarea>
+    <button class="action" onclick="addWorkout()">Einheit speichern</button>
+  </div>
+  <h2>Trainingsverlauf</h2>
+  <div id="trainingList" class="card"><div class="empty">Noch keine Einheiten vorhanden.</div></div>
+</section>
 
-header{padding:25px 20px 15px;display:flex;justify-content:space-between;align-items:center}
+<section id="plan" class="page">
+  <h1>Wochenplan</h1>
+  <p>Schreibe für jeden Tag den gesamten geplanten Ablauf in ein großes Textfeld.</p>
+  <div id="weekFields"></div>
+  <button class="action" onclick="savePlan()">Wochenplan speichern</button>
+  <p class="small">Dein Plan bleibt auf diesem Gerät gespeichert.</p>
+</section>
 
-.logo{font-size:25px;font-weight:900;letter-spacing:4px;color:var(--sage)}
+<section id="goals" class="page">
+  <h1>Persönliche Ziele</h1>
+  <p>Setze dir realistische Ziele, die zu deinem Alltag passen.</p>
+  <div class="card">
+    <h3>Neues Ziel</h3>
+    <label>Mein Ziel</label>
+    <input id="goalName" placeholder="z. B. regelmäßig aktiv sein">
+    <label>Beschreibung (optional)</label>
+    <textarea id="goalDescription" placeholder="Was möchtest du erreichen?"></textarea>
+    <button class="action" onclick="addGoal()">Ziel hinzufügen</button>
+  </div>
+  <div id="goalList"></div>
+</section>
 
-.tagline{font-size:9px;letter-spacing:2px;color:var(--muted);margin-top:4px}
+<section id="achievements" class="page">
+  <h1>Erfolge</h1>
+  <p>Hier erscheinen Meilensteine, die du durch deine Einträge erreichst.</p>
+  <div id="achievementList" class="card"></div>
+</section>
 
-main{padding:0 16px;max-width:700px;margin:auto}
+<section id="profile" class="page">
+  <h1>Profil & Daten</h1>
+  <div class="card">
+    <h3>Dein Profil</h3>
+    <label>Name oder Spitzname (optional)</label>
+    <input id="profileName" placeholder="Dein Name">
+    <button class="action" onclick="saveProfile()">Profil speichern</button>
+  </div>
+  <div class="card">
+    <h3>Datensicherung</h3>
+    <p>Exportiere deine Einträge regelmäßig als Backup.</p>
+    <button class="action" onclick="exportData()">Backup herunterladen</button>
+    <label>Backup wiederherstellen</label>
+    <input type="file" id="importFile" accept="application/json">
+    <button class="action secondary" onclick="importData()">Backup importieren</button>
+  </div>
+  <div class="card">
+    <h3>GPS-Aktivität</h3>
+    <p>GPS kann bei einer aktiven Trainingseinheit im geöffneten Browser genutzt werden. Die Standortfreigabe ist freiwillig.</p>
+    <button class="action secondary" onclick="showPage('gps')">GPS öffnen</button>
+  </div>
+</section>
 
-.page{display:none}.page.active{display:block}
+<section id="gps" class="page">
+  <h1>GPS-Aktivität</h1>
+  <p>Für Lauf- oder Radtouren. Standortdaten werden nur während einer gestarteten Aufzeichnung erfasst.</p>
+  <div class="card">
+    <label>Aktivität</label>
+    <select id="gpsSport"><option>Laufen</option><option>Radfahren</option><option>Gehen</option></select>
+    <div class="grid">
+      <div class="stat"><small>Distanz</small><strong id="gpsDistance">0.00 km</strong></div>
+      <div class="stat"><small>Zeit</small><strong id="gpsTime">00:00</strong></div>
+    </div>
+    <div class="row">
+      <button class="action" onclick="startGPS()">Start</button>
+      <button class="action secondary" onclick="stopGPS()">Stop</button>
+    </div>
+    <p id="gpsStatus" class="small">Noch keine Aufzeichnung gestartet.</p>
+    <button class="action secondary" onclick="saveGPS()">Aktivität speichern</button>
+  </div>
+</section>
 
-h2{font-size:23px;margin:18px 0 14px}
+</main>
 
-h3{font-size:16px;margin:0 0 12px}
+<nav>
+  <button class="active" onclick="showPage('home',this)"><span>⌂</span>Home</button>
+  <button onclick="showPage('training',this)"><span>＋</span>Training</button>
+  <button onclick="showPage('plan',this)"><span>▦</span>Plan</button>
+  <button onclick="showPage('goals',this)"><span>◎</span>Ziele</button>
+  <button onclick="showPage('achievements',this)"><span>✧</span>Erfolge</button>
+  <button onclick="showPage('profile',this)"><span>⚙</span>Mehr</button>
+</nav><script>
+const DAYS = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
 
-.card{background:var(--panel);border:1px solid #304137;border-radius:17px;padding:17px;margin:13px 0}
+let data = {
+  workouts: [],
+  goals: [],
+  plan: {},
+  profile: { name: "" }
+};
 
+function loadData() {
+  try {
+    const saved = localStorage.getItem("skyform_data");
+    if (saved) data = { ...data, ...JSON.parse(saved) };
+  } catch (e) {
+    console.error("Daten konnten nicht geladen werden:", e);
+  }
+}
 
+function saveData() {
+  localStorage.setItem("skyform_data", JSON.stringify(data));
+}
+
+function showPage(id, button) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  const page = document.getElementById(id);
+  if (page) page.classList.add("active");
+
+  document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+  if (button) button.classList.add("active");
+  else {
+    const navButton = [...document.querySelectorAll("nav button")]
+      .find(b => b.getAttribute("onclick")?.includes("'" + id + "'"));
+    if (navButton) navButton.classList.add("active");
+  }
+  window.scrollTo(0, 0);
+}
+
+function makeId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+}
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;",
+    '"':"&quot;", "'":"&#39;"
+  })[char]);
+}
+
+function formatDate(date) {
+  if (!date) return "";
+  return new Date(date + "T12:00:00").toLocaleDateString("de-DE", {
+    day:"2-digit", month:"2-digit", year:"numeric"
+  });
+}
+
+function buildWeekFields() {
+  const container = document.getElementById("weekFields");
+  container.innerHTML = DAYS.map(day => `
+    <div class="card">
+      <div class="weekday">${day}</div>
+      <textarea id="plan_${day}" placeholder="Schreibe deinen gesamten Tagesplan hier hinein ...">${escapeHTML(data.plan[day] || "")}</textarea>
+    </div>
+  `).join("");
+}
+
+function savePlan() {
+  DAYS.forEach(day => {
+    data.plan[day] = document.getElementById("plan_" + day).value;
+  });
+  saveData();
+  alert("Dein Wochenplan wurde gespeichert.");
+}
+
+function addWorkout() {
+  const date = document.getElementById("workDate").value;
+  const sport = document.getElementById("workSport").value;
+  const name = document.getElementById("workName").value.trim();
+  const duration = Number(document.getElementById("workDuration").value) || 0;
+  const note = document.getElementById("workNote").value.trim();
+  const details = document.getElementById("workDetails").value.trim();
+
+  if (!date) {
+    alert("Bitte wähle zuerst ein Datum aus.");
+    return;
+  }
+  if (!name && !details) {
+    alert("Bitte gib deiner Einheit einen Namen oder trage Details ein.");
+    return;
+  }
+
+  data.workouts.push({
+    id: makeId(), date, sport,
+    name: name || sport,
+    duration, note, details,
+    created: new Date().toISOString()
+  });
+
+  saveData();
+
+  ["workName","workDuration","workNote","workDetails"].forEach(id => {
+    document.getElementById(id).value = "";
+  });
+
+  renderAll();
+  alert("Trainingseinheit gespeichert!");
+}
+
+function deleteWorkout(id) {
+  if (!confirm("Möchtest du diese Trainingseinheit wirklich löschen?")) return;
+  data.workouts = data.workouts.filter(w => w.id !== id);
+  saveData();
+  renderAll();
+}
+
+function renderWorkouts() {
+  const list = document.getElementById("trainingList");
+  const sorted = [...data.workouts].sort((a,b) =>
+    b.date.localeCompare(a.date) || b.created.localeCompare(a.created)
+  );
+
+  if (!sorted.length) {
+    list.innerHTML = '<div class="empty">Noch keine Einheiten vorhanden.</div>';
+    return;
+  }
+
+  const groups = {};
+  sorted.forEach(w => {
+    if (!groups[w.date]) groups[w.date] = [];
+    groups[w.date].push(w);
+  });
+
+  list.innerHTML = Object.keys(groups).map(date => `
+    <div class="weekday">${formatDate(date)}</div>
+    ${groups[date].map(w => `
+      <div class="entry">
+        <strong>${escapeHTML(w.name)}</strong>
+        <div class="small muted">${escapeHTML(w.sport)} · ${w.duration} Min.</div>
+        ${w.note ? `<p>${escapeHTML(w.note)}</p>` : ""}
+        ${w.details ? `<p>${escapeHTML(w.details).replace(/\n/g,"<br>")}</p>` : ""}
+        <button class="action danger small" onclick="deleteWorkout('${w.id}')">Löschen</button>
+      </div>
+    `).join("")}
+  `).join("");
+}
+
+function renderHome() {
+  const workouts = data.workouts;
+  const days = new Set(workouts.map(w => w.date));
+  const sports = new Set(workouts.map(w => w.sport));
+
+  document.getElementById("statSessions").textContent = workouts.length;
+  document.getElementById("statDays").textContent = days.size;
+  document.getElementById("statSports").textContent = sports.size;
+  document.getElementById("statAwards").textContent = countAchievements();
+
+  const recent = [...workouts].sort((a,b) =>
+    b.date.localeCompare(a.date) || b.created.localeCompare(a.created)
+  ).slice(0,4);
+
+  document.getElementById("recentList").innerHTML = recent.length
+    ? recent.map(w => `
+      <div class="entry">
+        <strong>${escapeHTML(w.name)}</strong>
+        <div class="small muted">${formatDate(w.date)} · ${escapeHTML(w.sport)}</div>
+      </div>
+    `).join("")
+    : '<div class="empty">Noch keine Trainings eingetragen.</div>';
+
+  const homeGoals = document.getElementById("homeGoals");
+  const activeGoals = data.goals.filter(g => !g.done);
+  homeGoals.innerHTML = activeGoals.length
+    ? activeGoals.slice(0,3).map(g => `<div class="entry">${escapeHTML(g.name)}</div>`).join("")
+    : '<div class="empty">Lege dein erstes persönliches Ziel an.</div>';
+}
+
+function renderAll() {
+  renderHome();
+  renderWorkouts();
+  renderGoals();
+  renderAchievements();
+}function addGoal() {
+  const name = document.getElementById("goalName").value.trim();
+  const description = document.getElementById("goalDescription").value.trim();
+
+  if (!name) {
+    alert("Bitte gib deinem Ziel einen Namen.");
+    return;
+  }
+
+  data.goals.push({
+    id: makeId(),
+    name,
+    description,
+    done: false,
+    created: new Date().toISOString()
+  });
+
+  document.getElementById("goalName").value = "";
+  document.getElementById("goalDescription").value = "";
+  saveData();
+  renderAll();
+}
+
+function toggleGoal(id) {
+  const goal = data.goals.find(g => g.id === id);
+  if (!goal) return;
+  goal.done = !goal.done;
+  saveData();
+  renderAll();
+}
+
+function deleteGoal(id) {
+  if (!confirm("Dieses Ziel löschen?")) return;
+  data.goals = data.goals.filter(g => g.id !== id);
+  saveData();
+  renderAll();
+}
+
+function renderGoals() {
+  const list = document.getElementById("goalList");
+
+  if (!data.goals.length) {
+    list.innerHTML = '<div class="card empty">Noch keine Ziele angelegt.</div>';
+    return;
+  }
+
+  list.innerHTML = data.goals.map(g => `
+    <div class="card">
+      <h3>${escapeHTML(g.name)}</h3>
+      ${g.description ? `<p>${escapeHTML(g.description)}</p>` : ""}
+      <span class="pill">${g.done ? "Erledigt" : "In Arbeit"}</span>
+      <div class="row">
+        <button class="action secondary" onclick="toggleGoal('${g.id}')">
+          ${g.done ? "Wieder öffnen" : "Als erledigt markieren"}
+        </button>
+        <button class="action danger" onclick="deleteGoal('${g.id}')">Löschen</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function getAchievements() {
+  const total = data.workouts.length;
+  const activeDays = new Set(data.workouts.map(w => w.date)).size;
+  const sports = new Set(data.workouts.map(w => w.sport)).size;
+  const completedGoals = data.goals.filter(g => g.done).length;
+
+  return [
+    { title: "Erster Schritt", description: "Deine erste Einheit eingetragen", earned: total >= 1 },
+    { title: "Fünf Einheiten", description: "Fünf Trainingseinheiten gesammelt", earned: total >= 5 },
+    { title: "Zehn Einheiten", description: "Zehn Trainingseinheiten gesammelt", earned: total >= 10 },
+    { title: "Aktiv unterwegs", description: "An fünf verschiedenen Tagen aktiv gewesen", earned: activeDays >= 5 },
+    { title: "Abwechslung", description: "Drei verschiedene Sportarten ausprobiert", earned: sports >= 3 },
+    { title: "Ziel erreicht", description: "Ein persönliches Ziel abgeschlossen", earned: completedGoals >= 1 }
+  ];
+}
+
+function countAchievements() {
+  return getAchievements().filter(a => a.earned).length;
+}
+
+function renderAchievements() {
+  const list = document.getElementById("achievementList");
+  const awards = getAchievements();
+
+  list.innerHTML = awards.map(a => `
+    <div class="entry">
+      <strong>${a.earned ? "✦ " : "○ "}${escapeHTML(a.title)}</strong>
+      <div class="small muted">${escapeHTML(a.description)}</div>
+      <span class="pill">${a.earned ? "Freigeschaltet" : "Noch offen"}</span>
+    </div>
+  `).join("");
+}
+
+function saveProfile() {
+  data.profile.name = document.getElementById("profileName").value.trim();
+  saveData();
+  alert("Profil gespeichert.");
+}
+
+function exportData() {
+  const file = new Blob(
+    [JSON.stringify(data, null, 2)],
+    { type: "application/json" }
+  );
+
+  const url = URL.createObjectURL(file);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "skyform-backup.json";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function importData() {
+  const input = document.getElementById("importFile");
+  const file = input.files[0];
+
+  if (!file) {
+    alert("Bitte wähle zuerst eine Backup-Datei aus.");
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    try {
+      const imported = JSON.parse(reader.result);
+
+      if (
+        !imported ||
+        !Array.isArray(imported.workouts) ||
+        !Array.isArray(imported.goals) ||
+        typeof imported.plan !== "object"
+      ) {
+        throw new Error("Ungültiges Backup");
+      }
+
+      if (!confirm("Vorhandene Daten durch das Backup ersetzen?")) return;
+
+      data = {
+        workouts: imported.workouts,
+        goals: imported.goals,
+        plan: imported.plan || {},
+        profile: imported.profile || { name: "" }
+      };
+
+      saveData();
+      buildWeekFields();
+      document.getElementById("profileName").value = data.profile.name || "";
+      renderAll();
+      alert("Backup erfolgreich wiederhergestellt.");
+    } catch (error) {
+      alert("Die Datei konnte nicht als SKYFORM-Backup gelesen werden.");
+    }
+  };
+
+  reader.readAsText(file);
+}let gpsWatchId = null;
+let gpsStartTime = null;
+let gpsElapsed = 0;
+let gpsDistanceMeters = 0;
+let gpsLastPosition = null;
+let gpsTimer = null;
+let gpsRunning = false;
+
+function distanceBetween(a, b) {
+  const earth = 6371000;
+  const rad = value => value * Math.PI / 180;
+  const lat1 = rad(a.latitude);
+  const lat2 = rad(b.latitude);
+  const dLat = rad(b.latitude - a.latitude);
+  const dLon = rad(b.longitude - a.longitude);
+
+  const x = Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) *
+    Math.sin(dLon / 2) ** 2;
+
+  return earth * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+}
+
+function updateGPSDisplay() {
+  document.getElementById("gpsDistance").textContent =
+    (gpsDistanceMeters / 1000).toFixed(2) + " km";
+
+  const totalSeconds = Math.floor(gpsElapsed / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
+  document.getElementById("gpsTime").textContent =
+    String(minutes).padStart(2,"0") + ":" +
+    String(seconds).padStart(2,"0");
+}
+
+function startGPS() {
+  if (!navigator.geolocation) {
+    alert("GPS wird von diesem Browser nicht unterstützt.");
+    return;
+  }
+
+  if (gpsRunning) return;
+
+  gpsDistanceMeters = 0;
+  gpsElapsed = 0;
+  gpsLastPosition = null;
+  gpsStartTime = Date.now();
+  gpsRunning = true;
+
+  document.getElementById("gpsStatus").textContent =
+    "Warte auf GPS-Standortfreigabe ...";
+
+  gpsTimer = setInterval(() => {
+    gpsElapsed = Date.now() - gpsStartTime;
+    updateGPSDisplay();
+  }, 1000);
+
+  gpsWatchId = navigator.geolocation.watchPosition(
+    position => {
+      const current = position.coords;
+
+      if (gpsLastPosition) {
+        const distance = distanceBetween(gpsLastPosition, current);
+
+        // Kleine GPS-Schwankungen nicht als Bewegung zählen.
+        if (distance > 3 && distance < 100) {
+          gpsDistanceMeters += distance;
+        }
+      }
+
+      gpsLastPosition = current;
+      document.getElementById("gpsStatus").textContent =
+        "GPS-Aufzeichnung läuft.";
+      updateGPSDisplay();
+    },
+    error => {
+      document.getElementById("gpsStatus").textContent =
+        "GPS-Fehler: " + error.message;
+      stopGPS();
+    },
+    {
+      enableHighAccuracy: true,
+      maximumAge: 1000,
+      timeout: 15000
+    }
+  );
+}
+
+function stopGPS() {
+  if (gpsWatchId !== null) {
+    navigator.geolocation.clearWatch(gpsWatchId);
+    gpsWatchId = null;
+  }
+
+  if (gpsTimer !== null) {
+    clearInterval(gpsTimer);
+    gpsTimer = null;
+  }
+
+  if (gpsRunning && gpsStartTime) {
+    gpsElapsed = Date.now() - gpsStartTime;
+  }
+
+  gpsRunning = false;
+  updateGPSDisplay();
+
+  document.getElementById("gpsStatus").textContent =
+    "Aufzeichnung gestoppt.";
+}
+
+function saveGPS() {
+  if (gpsRunning) stopGPS();
+
+  if (!gpsStartTime) {
+    alert("Starte zuerst eine GPS-Aufzeichnung.");
+    return;
+  }
+
+  const distance = (gpsDistanceMeters / 1000).toFixed(2);
+  const duration = Math.max(1, Math.round(gpsElapsed / 60000));
+  const sport = document.getElementById("gpsSport").value;
+  const date = new Date().toISOString().slice(0,10);
+
+  data.workouts.push({
+    id: makeId(),
+    date,
+    sport,
+    name: sport + " mit GPS",
+    duration,
+    note: "Distanz: " + distance + " km",
+    details: "GPS-Aufzeichnung: " + distance + " km",
+    created: new Date().toISOString()
+  });
+
+  saveData();
+  renderAll();
+
+  gpsStartTime = null;
+  gpsElapsed = 0;
+  gpsDistanceMeters = 0;
+  gpsLastPosition = null;
+  updateGPSDisplay();
+
+  document.getElementById("gpsStatus").textContent =
+    "GPS-Aktivität wurde gespeichert.";
+
+  alert("GPS-Aktivität gespeichert!");
+}
+
+// App starten
+loadData();
+
+const today = new Date();
+const localDate = [
+  today.getFullYear(),
+  String(today.getMonth() + 1).padStart(2, "0"),
+  String(today.getDate()).padStart(2, "0")
+].join("-");
+
+document.getElementById("workDate").value = localDate;
+document.getElementById("profileName").value =
+  data.profile.name || "";
+
+buildWeekFields();
+renderAll();
+</script>
+</body>
+</html>
