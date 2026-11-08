@@ -229,6 +229,13 @@ img {
   }
 }
 </style>
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
 select option {
   background: #17271f;
   color: #f0f4ef;
@@ -451,7 +458,7 @@ window.addEventListener("pagehide", saveData);
 
 
 function showPage(id, button) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  dokument.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   const page = document.getElementById(id);
   if (page) page.classList.add("active");
 
